@@ -136,10 +136,11 @@ class _TimerState extends State<Timer> {
   @override
   Widget build(BuildContext context) {
     Future.doWhile(() async {
-      await Future.delayed(Duration(seconds: 1));
-      x++;
-      if (x < 1000 && !isPaused) {
+      value++;
+      await Future.delayed(const Duration(seconds: 1));
+      if (value < 1000 && !isPaused) {
         setState(() {
+          x = value;
           print(x);
           timePassed = duration();
         });
