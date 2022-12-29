@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import './timer.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -14,7 +15,7 @@ class HomePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            flex: 4,
+            flex: 6,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 border: Border.all(
@@ -29,7 +30,7 @@ class HomePage extends StatelessWidget {
             height: 5,
           ),
           Expanded(
-            flex: 10,
+            flex: 0,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 border: Border.all(
@@ -44,7 +45,7 @@ class HomePage extends StatelessWidget {
             height: 5,
           ),
           Expanded(
-            flex: 2,
+            flex: 0,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 border: Border.all(
@@ -59,7 +60,7 @@ class HomePage extends StatelessWidget {
             height: 5,
           ),
           Expanded(
-            flex: 2,
+            flex: 0,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 border: Border.all(
@@ -113,56 +114,114 @@ class TimesList extends StatelessWidget {
   }
 }
 
-class Timer extends StatefulWidget {
-  const Timer({
-    Key? key,
-  }) : super(key: key);
+// class Timer extends StatefulWidget {
+//   const Timer({
+//     Key? key,
+//   }) : super(key: key);
 
-  @override
-  State<Timer> createState() => _TimerState();
-}
+//   @override
+//   State<Timer> createState() => _TimerState();
+// }
 
-class _TimerState extends State<Timer> {
-  final DateTime start = DateTime.now();
-  int x = 0;
-  var value = 0;
-  Duration timePassed = const Duration(seconds: 0);
-  bool isPaused = true;
+//  class _TimerState extends State<Timer> {
+//   List<Duration> sessions = [];
+//   int x = 0;
+//   var value = 0;
+//   DateTime startTime = DateTime.now();
+//   Duration durationPassed = const Duration(seconds: 0);
+//   Duration sessionDuration = const Duration(seconds: 0);
+//   Duration finalDuration = const Duration(seconds: 0);
+//   bool isTicking = false;
 
-  Duration duration() {
-    return DateTime.now().difference(start);
-  }
+//   Duration calcDuration({required DateTime startTime, DateTime? endTime}) {
+//     endTime = endTime ?? DateTime.now();
+//     return endTime.difference(startTime);
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    Future.doWhile(() async {
-      value++;
-      await Future.delayed(const Duration(seconds: 1));
-      if (value < 1000 && !isPaused) {
-        setState(() {
-          x = value;
-          print(x);
-          timePassed = duration();
-        });
-        return false;
-      }
-      return true;
-    });
-    return Column(
-      children: [
-        Text(x.toString()),
-        Text(
-            'time \ ${timePassed.toString().substring(0, timePassed.toString().indexOf('.'))}'),
-        ElevatedButton(
-            onPressed: () {
-              setState(() {
-                isPaused = isPaused ? false : true;
-                print(isPaused);
-              });
-            },
-            child: Text(
-                'pause')) //: ${timePassed.inMinutes} :${timePassed.inSeconds}'
-      ],
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     Future.doWhile(() async {
+//       value++;
+//       await Future.delayed(const Duration(seconds: 1));
+//       if (isTicking) {
+//         setState(() {
+//           x = value;
+//           print(x);
+//           durationPassed = sessionDuration +calcDuration(startTime: startTime);
+//         });
+//         return false;
+//       }
+//       return true;
+//     });
+
+//     return Column(
+//       children: [
+//         Text(x.toString()),
+//         Text(
+//           'time ${sessionDuration.toString().substring(0, sessionDuration.toString().indexOf('.'))}',
+//         ),
+
+//         ElevatedButton(
+//           onPressed: () {
+//             setState(() {
+//               isTicking = isTicking ? false : true;
+//               if (isTicking) {
+//                 startTime = DateTime.now();
+//                 //durationPassed = sessionDuration;
+//                 print('### start $isTicking');
+//                 print('###durationPassed $durationPassed');
+//                 print('###sessionDuration $sessionDuration');
+//                 print('###finalDuration $finalDuration');
+//               } else {
+//                 sessionDuration = durationPassed;
+//                 //durationPassed = const Duration(seconds: 0);
+//                 print('### stop $isTicking');
+//                 print('###durationPassed $durationPassed');
+//                 print('###sessionDuration $sessionDuration');
+//                 print('###finalDuration $finalDuration');
+//               }
+
+//               print(isTicking);
+//             });
+//           },
+//           child: Text(isTicking ? 'pause' : 'Resume'),
+//         ),
+//         ElevatedButton(
+//           onPressed: () {
+//             setState(() {
+//               isTicking = false;
+//               finalDuration = sessionDuration + durationPassed;
+//               sessions.add(sessionDuration);
+//               print('### $isTicking');
+//               print('###1 $durationPassed');
+//               print('###2 $sessionDuration');
+//               print('###3 $finalDuration');
+//               durationPassed = const Duration(seconds: 0);
+//               durationPassed = const Duration(seconds: 0);
+//               sessionDuration = const Duration(seconds: 0);
+//               print('### $isTicking');
+//               print('###4 $durationPassed');
+//               print('###5 $sessionDuration');
+//               print('###6 $finalDuration');
+//             });
+//           },
+//           child: const Text('Stop'),
+//         ),
+
+//         Text(
+//             'total session time ${sessionDuration.toString().substring(0, sessionDuration.toString().indexOf('.'))}'),
+//         ElevatedButton(
+//             onPressed: () {
+//               setState(() {
+//                 sessions.clear();
+//               });
+//             },
+//             child: const Text('clear list')),
+//         ...sessions.map((e) => Text(e.toString()))
+
+//         //: ${timePassed.inMinutes} :${timePassed.inSeconds}'
+//       ],
+//     );
+//   }
+// }
+
