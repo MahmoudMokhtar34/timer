@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart';
 
 class AppState {
   int test = 0;
+  int test2 = 0;
+  int press = 0;
   List<Duration> sessions;
   static const Duration zeroingDuration = Duration(seconds: 0);
   DateTime? sessionStartTime;

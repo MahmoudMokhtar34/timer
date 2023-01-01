@@ -1,7 +1,10 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:timer/model/app_state.dart';
 import 'package:timer/model/inherited_state.dart';
 import 'package:timer/model/state_widget.dart';
+import 'package:timer/pages/home_page/time_widget.dart';
 
 class InheritedTimer extends StatefulWidget {
   const InheritedTimer({
@@ -17,17 +20,16 @@ class _InheritedTimerState extends State<InheritedTimer> {
   Widget build(BuildContext context) {
     Provider provider = InheritedState.of(context) as Provider;
     AppState appState = provider.appState;
-
+    print('### build 1 ${appState.test++}');
     return Column(
       children: [
-        Text(
-          'time ${provider.formatDuration(appState.sessionDuration + appState.lapDuration)}',
-        ),
+        TimeWidget(provider: provider, appState: appState),
 //Start / Pause / Resume Button
         ElevatedButton(
           onPressed: () {
             provider.startPAuseResume(
                 appState: appState, provider: provider, setState: setState);
+            print('### press ${appState.press++}');
           },
           child: Text(appState.isStarted
               ? 'pause'
@@ -39,20 +41,22 @@ class _InheritedTimerState extends State<InheritedTimer> {
         ElevatedButton(
           onPressed: () {
             provider.stop(appState: appState, setState: setState);
-            print('### ${appState.sessions}');
+            print('### press ${appState.press++}');
           },
           child: const Text('Stop'),
         ),
 
         Text(
             'total session time ${provider.formatDuration(appState.sessionDuration)}'),
-        Builder(builder: (context) {
-          return ElevatedButton(
-              onPressed: () {
-                provider.deleteSessions(appState: appState, setState: setState);
-              },
-              child: const Text('clear list'));
-        }),
+//delete all sessions
+        ElevatedButton(
+            onPressed: () {
+              provider.deleteSessions(appState: appState, setState: setState);
+              appState.test = 0;
+              appState.test2 = 0;
+              appState.press = 0;
+            },
+            child: const Text('clear list')),
         //...appState.sessions.map((e) => Text(e.toString()))
         ...appState.sessions.map((e) => Text(e.toString())),
         Padding(

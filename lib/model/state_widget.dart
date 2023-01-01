@@ -36,7 +36,6 @@ class Provider extends State<StateWidget> {
         (timer) {
           setState(
             () {
-              print('### ${appState.test++}');
               if (appState.sessionStartTime == null) return;
               appState.lapDuration =
                   DateTime.now().difference(appState.sessionStartTime!);
@@ -68,7 +67,6 @@ class Provider extends State<StateWidget> {
         appState.lapDuration = AppState.zeroingDuration;
       }
     });
-    provider.activateTimerTimer(setState: setState);
   }
 
 //
