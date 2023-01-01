@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-class Timer extends StatefulWidget {
-  const Timer({
+class MyTimer extends StatefulWidget {
+  const MyTimer({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<Timer> createState() => _TimerState();
+  State<MyTimer> createState() => _MyTimerState();
 }
 
-class _TimerState extends State<Timer> {
+class _MyTimerState extends State<MyTimer> {
   List<Duration> sessions = [];
   int x = 0;
   var value = 0;
@@ -50,9 +50,13 @@ class _TimerState extends State<Timer> {
     activateTimer();
     return Column(
       children: [
-        Text(x.toString()),
-        Text(
-          'time ${formatDuration(sessionDuration + currentDuration)}',
+        Column(
+          children: [
+            Text(x.toString()),
+            Text(
+              'time ${formatDuration(sessionDuration + currentDuration)}',
+            ),
+          ],
         ),
 
         ElevatedButton(

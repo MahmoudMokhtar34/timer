@@ -1,62 +1,71 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
-import 'package:flutter/material.dart';
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 
 class AppState {
-  final int counter;
-  final MaterialColor color;
-  final bool isPressed;
+  int test = 0;
+  List<Duration> sessions;
+  static const Duration zeroingDuration = Duration(seconds: 0);
+  DateTime? sessionStartTime;
+  //each (start or resume)/pause  cycle has its own currentduration
+  Duration lapDuration;
+  Duration sessionDuration;
+  bool isStarted;
+  Timer? timerObject;
+
   AppState({
-    this.counter = 0,
-    this.color = Colors.green,
-    this.isPressed = false,
+    required this.sessions,
+    this.sessionStartTime,
+    this.lapDuration = zeroingDuration,
+    this.sessionDuration = zeroingDuration,
+    this.isStarted = false,
+    this.timerObject,
   });
 
   AppState copyWith({
-    int? counter,
-    MaterialColor? color,
-    bool? isPressed,
+    List<Duration>? sessions,
+    DateTime? sessionStartTime,
+    Duration? lapDuration,
+    Duration? sessionDuration,
+    bool? isStarted,
+    Timer? timerObject,
   }) {
     return AppState(
-      counter: counter ?? this.counter,
-      color: color ?? this.color,
-      isPressed: isPressed ?? this.isPressed,
+      sessions: sessions ?? this.sessions,
+      sessionStartTime: sessionStartTime ?? this.sessionStartTime,
+      lapDuration: lapDuration ?? this.lapDuration,
+      sessionDuration: sessionDuration ?? this.sessionDuration,
+      isStarted: isStarted ?? this.isStarted,
+      timerObject: timerObject ?? this.timerObject,
     );
   }
 
   @override
-  String toString() =>
-      'AppState(counter: $counter, color: $color, isPressed: $isPressed)';
+  String toString() {
+    return 'AppState(sessions: $sessions, sessionStartTime: $sessionStartTime, currentDuration: $lapDuration, sessionDuration: $sessionDuration, isStarted: $isStarted, timerObject: $timerObject)';
+  }
 
   @override
   bool operator ==(covariant AppState other) {
     if (identical(this, other)) return true;
 
-    return other.counter == counter &&
-        other.color == color &&
-        other.isPressed == isPressed;
+    return listEquals(other.sessions, sessions) &&
+        other.sessionStartTime == sessionStartTime &&
+        other.lapDuration == lapDuration &&
+        other.sessionDuration == sessionDuration &&
+        other.isStarted == isStarted &&
+        other.timerObject == timerObject;
   }
 
   @override
-  int get hashCode => counter.hashCode ^ color.hashCode ^ isPressed.hashCode;
-
-  // Map<String, dynamic> toMap() {
-  //   return <String, dynamic>{
-  //     'counter': counter,
-  //     'color': color.toMap(),
-  //     'isPressed': isPressed,
-  //   };
-  // }
-
-  // factory AppState.fromMap(Map<String, dynamic> map) {
-  //   return AppState(
-  //     counter: map['counter'] as int,
-  //     color: MaterialColor.fromMap(map['color'] as Map<String,dynamic>),
-  //     isPressed: map['isPressed'] as bool,
-  //   );
-  // }
-
-  //String toJson() => json.encode(toMap());
-
-  //factory AppState.fromJson(String source) => AppState.fromMap(json.decode(source) as Map<String, dynamic>);
+  int get hashCode {
+    return sessions.hashCode ^
+        sessionStartTime.hashCode ^
+        lapDuration.hashCode ^
+        sessionDuration.hashCode ^
+        isStarted.hashCode ^
+        timerObject.hashCode;
+  }
 }

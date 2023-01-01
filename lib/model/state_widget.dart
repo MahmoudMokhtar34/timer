@@ -1,10 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import './app_state.dart';
 import './inherited_state.dart';
 
 class StateWidget extends StatefulWidget {
-  const StateWidget({super.key, required this.child});
+  const StateWidget({
+    super.key,
+    required this.child,
+  });
 
   final Widget child;
 
@@ -13,64 +18,105 @@ class StateWidget extends StatefulWidget {
 }
 
 class Provider extends State<StateWidget> {
-  AppState appState = AppState();
+  AppState appState = AppState(sessions: []);
 
   @override
   Widget build(BuildContext context) {
     return InheritedState(
-        appState: appState, provider: this, child: widget.child);
+      appState: appState,
+      provider: this,
+      child: widget.child,
+    );
   }
 
-  void increment(int by) {
-    final int newCount = appState.counter + by;
-    final newAppState = appState.copyWith(counter: newCount);
+  void activateTimerTimer({required Function setState}) {
+    if (appState.isStarted) {
+      appState.timerObject = Timer.periodic(
+        const Duration(seconds: 1),
+        (timer) {
+          setState(
+            () {
+              print('### ${appState.test++}');
+              if (appState.sessionStartTime == null) return;
+              appState.lapDuration =
+                  DateTime.now().difference(appState.sessionStartTime!);
+            },
+          );
+        },
+      );
+    } else {
+      appState.timerObject?.cancel();
+    }
+  }
 
+//if any bug add these params
+//
+  void startPAuseResume({
+    required AppState appState,
+    required Provider provider,
+    required Function setState,
+  }) {
     setState(() {
-      appState = newAppState;
+      appState.isStarted = appState.isStarted ? false : true;
+      if (appState.isStarted) {
+        appState.sessionStartTime = DateTime.now();
+        appState.lapDuration = AppState.zeroingDuration;
+      } else {
+        appState.timerObject?.cancel();
+        appState.sessionDuration =
+            appState.sessionDuration + appState.lapDuration;
+        appState.lapDuration = AppState.zeroingDuration;
+      }
+    });
+    provider.activateTimerTimer(setState: setState);
+  }
+
+//
+  void stop({
+    required AppState appState,
+    required Function setState,
+  }) {
+    setState(() {
+      appState.timerObject?.cancel();
+      appState.isStarted = false;
+      appState.sessionDuration =
+          appState.sessionDuration + appState.lapDuration;
+      appState.sessions.add(appState.sessionDuration);
+      appState.lapDuration = AppState.zeroingDuration;
+      appState.sessionDuration = AppState.zeroingDuration;
     });
   }
 
-   void setCounter(int to) {
-    
-    final newAppState = appState.copyWith(counter: to);
-
+//
+  void deleteSessions({
+    required AppState appState,
+    required Function setState,
+  }) {
     setState(() {
-      appState = newAppState;
+      appState.sessions.clear();
     });
   }
 
-  void longIncrement(int by) async {
-    await Future.delayed(const Duration(seconds: 2), (() {
-      final int newCount = appState.counter + by;
-      final newAppState = appState.copyWith(counter: newCount, isPressed: true);
-
-      setState(() {
-        appState = newAppState;
-      });
-    }));
+  String formatDuration(Duration duration) {
+    return duration.toString().substring(0, duration.toString().indexOf('.'));
   }
 
-  void stopIncrement() {
-    final newAppState = appState.copyWith(isPressed: false);
-    setState(() {
-      appState = newAppState;
-    });
+  Duration sumSessions() {
+    Duration sum = AppState.zeroingDuration;
+
+    for (var element in appState.sessions) {
+      sum += element;
+    }
+
+    return sum;
   }
 
-  void decrement(int by) {
-    final int newCount = appState.counter - by;
-    final newAppState = appState.copyWith(counter: newCount);
+  Duration avgSessions() {
+    if (appState.sessions.isEmpty) {
+      return AppState.zeroingDuration;
+    }
+    double avgInSeconds = sumSessions().inSeconds / appState.sessions.length;
 
-    setState(() {
-      appState = newAppState;
-    });
-  }
-
-  void changeColor(MaterialColor color) {
-    final newAppState = appState.copyWith(color: color);
-
-    setState(() {
-      appState = newAppState;
-    });
+    return Duration(seconds: avgInSeconds.round());
   }
 }
