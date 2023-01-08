@@ -4,6 +4,7 @@ import 'model/state_widget.dart';
 import 'pages/home_page/home_page.dart';
 
 void main() {
+  //debugPaintSizeEnabled = true;
   runApp(const MyApp());
 }
 

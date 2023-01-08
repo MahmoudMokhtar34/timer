@@ -23,6 +23,7 @@ class _InheritedTimerState extends State<InheritedTimer> {
     print('### build 1 ${appState.test++}');
     return Column(
       children: [
+//timer
         TimeWidget(provider: provider, appState: appState),
 //Start / Pause / Resume Button
         ElevatedButton(
@@ -45,7 +46,7 @@ class _InheritedTimerState extends State<InheritedTimer> {
           },
           child: const Text('Stop'),
         ),
-
+//final session time
         Text(
             'total session time ${provider.formatDuration(appState.sessionDuration)}'),
 //delete all sessions
@@ -57,27 +58,27 @@ class _InheritedTimerState extends State<InheritedTimer> {
               appState.press = 0;
             },
             child: const Text('clear list')),
-        //...appState.sessions.map((e) => Text(e.toString()))
+//List
         ...appState.sessions.map((e) => Text(e.toString())),
+        //Sum
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Text('Sum ${provider.sumSessions().inSeconds}'),
         ),
+//Average
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Text('Sum ${provider.avgSessions().inSeconds}'),
         ),
-        //: ${timePassed.inMinutes} :${timePassed.inSeconds}'
       ],
     );
   }
 }
 
-//TODO make a stateful widget and pass its state.set state method to the 
+//TODO make a stateful widget and pass its state.set state method to the
 //activate timer method in the start button
 //TODO test inherited widget change i it activates timer
 //TODO make the activate timer in the buld but call timer.cancel before it to avoid multi calling(recursion)
-
 
 //TODO separte timer widget & test isStated change to activate and send their own set state method
 //or  notify other widget when press buttton to set their state
