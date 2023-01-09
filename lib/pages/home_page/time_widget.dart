@@ -9,16 +9,21 @@ class TimeWidget extends StatefulWidget {
     Key? key,
     required this.provider,
     required this.appState,
+    required this.textStyle,
   }) : super(key: key);
 
   final Provider provider;
   final AppState appState;
+  final TextStyle textStyle;
 
   @override
   State<TimeWidget> createState() => _TimeWidgetState();
 }
 
 class _TimeWidgetState extends State<TimeWidget> {
+  final tenHours =
+      const Duration(hours: 10, minutes: 0, seconds: 0, milliseconds: 0);
+  late Duration currentSession;
   @override
   void initState() {
     super.initState();
@@ -28,14 +33,20 @@ class _TimeWidgetState extends State<TimeWidget> {
   @override
   void didUpdateWidget(covariant TimeWidget oldWidget) {
     widget.provider.activateTimerTimer(setState: setState);
+
     super.didUpdateWidget(oldWidget);
   }
 
   @override
   Widget build(BuildContext context) {
     print('### build 2 ${widget.appState.test2++}');
+
+    currentSession =
+        widget.appState.sessionDuration + widget.appState.lapDuration;
     return Text(
-      'time ${widget.provider.formatDuration(widget.appState.sessionDuration + widget.appState.lapDuration)}',
+      //add extra zero at the left for less than 10 hours duration
+      '${currentSession < tenHours ? '0' : ''}${widget.provider.formatDuration(currentSession)}',
+      style: widget.textStyle,
     );
   }
 }

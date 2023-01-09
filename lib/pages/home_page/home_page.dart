@@ -28,13 +28,13 @@ class _HomePageState extends State<HomePage> {
             SafeArea(
           child: Container(
             width: double.infinity,
-            color: Colors.grey,
+            color: Colors.grey[50],
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
 //Timer
                 Expanded(
-                  flex: 15,
+                  flex: 20,
                   child: timer(provider, appState),
                 ),
 //List of sessions,
@@ -44,8 +44,8 @@ class _HomePageState extends State<HomePage> {
                 ),
 //Statistics,
                 Expanded(
-                  flex: 10,
-                  child: statistics(provider),
+                  flex: 15,
+                  child: statistics(provider, appState),
                 ),
 //buttons,
                 Expanded(
@@ -58,51 +58,138 @@ class _HomePageState extends State<HomePage> {
         ));
   }
 
-  Container timer(Provider provider, AppState appState) {
-    return Container(
-        color: Colors.amber[50],
-        width: double.infinity,
-        alignment: Alignment.center,
-        child: TimeWidget(provider: provider, appState: appState));
+  Widget timer(Provider provider, AppState appState) {
+    Widget start = appState.isStarted
+        ? const SizedBox()
+        : const Center(
+            child: SizedBox.expand(
+                child: IconButton(
+            onPressed: null,
+            icon: Icon(
+              Icons.play_arrow,
+              size: 120,
+            ),
+          )));
+    Widget resume = appState.isStarted ? const Icon(Icons.pause) : Container();
+
+    return Stack(
+      children: [
+        Container(
+          width: double.infinity,
+          color: Colors.grey[200],
+          alignment: Alignment.center,
+          child: FittedBox(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TimeWidget(
+                  provider: provider,
+                  appState: appState,
+                  textStyle: const TextStyle(fontSize: 70),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: resume,
+        ),
+        start,
+        GestureDetector(
+          onTap: () {
+            provider.startPAuseResume(
+                appState: appState, provider: provider, setState: setState);
+            print('### press ${appState.press++}');
+          },
+        )
+      ],
+    );
   }
 
   Container sessionsList(AppState appState, Provider provider) {
     return Container(
-      color: Colors.amber,
+      color: Colors.grey[50],
       width: double.infinity,
       alignment: Alignment.topCenter,
-      child: Column(
-        children: <Widget>[
-          const Text('list'),
+      child:
           //...appState.sessions.map((e) => Text(e.toString())),
-          Expanded(
-            child: ListView.builder(
-              itemCount: appState.sessions.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Card(
-                  margin: const EdgeInsets.all(8.0),
-                  child: Center(
-                      child: Text(
-                          provider.formatDuration(appState.sessions[index]))),
-                );
-              },
+          ListView.builder(
+        itemCount: appState.sessions.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Card(
+            key: ObjectKey(appState.sessions[index]),
+            child: ListTile(
+              leading: Text('${index + 1}'),
+              title: Text(provider.formatDuration(appState.sessions[index])),
+              trailing: IconButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: ((context) {
+                          return deleteDialog(
+                              index,
+                              provider,
+                              appState,
+                              context,
+                              () => provider.deleteOneSession(
+                                    appState,
+                                    index,
+                                    setState,
+                                  ),
+                              'Confirm to delete Session ${index + 1}');
+                        }));
+                  },
+                  icon: const Icon(Icons.delete)),
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  Container statistics(Provider provider) {
+  Widget deleteDialog(int? index, Provider provider, AppState appState,
+      BuildContext context, Function delete, String message) {
+    return Center(
+      child: Container(
+          decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: const BorderRadius.all(Radius.circular(20))),
+          height: 200,
+          width: double.infinity,
+          alignment: Alignment.center,
+          margin: const EdgeInsetsDirectional.all(30),
+          child: Column(
+            children: [
+              Text(message),
+              TextButton.icon(
+                icon: const Icon(Icons.delete),
+                label: const Text('Delete'),
+                onPressed: () {
+                  delete();
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          )),
+    );
+  }
+
+  Container statistics(Provider provider, AppState appState) {
     return Container(
       color: Colors.blue[50],
       width: double.infinity,
       alignment: Alignment.center,
-      child: Column(
-        children: [
-          Text('Sum ${provider.formatDuration(provider.sumSessions())}'),
-          Text('Sum ${provider.sumSessions().inSeconds}'),
-        ],
+      child: FittedBox(
+        child: Column(
+          children: [
+            Text('Sum ${provider.formatDuration(provider.sumSessions())}'),
+            Text('Avg ${provider.formatDuration(provider.avgSessions())}'),
+            Text('number of sess ${appState.sessions.length}'),
+            const Text(
+                'editable max min limit // ask befor delete//coloring above limit'),
+          ],
+        ),
       ),
     );
   }
@@ -112,39 +199,41 @@ class _HomePageState extends State<HomePage> {
       color: Colors.green[50],
       width: double.infinity,
       alignment: Alignment.center,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          //Start / Pause / Resume Button
-          ElevatedButton(
-            onPressed: () {
-              provider.startPAuseResume(
-                  appState: appState, provider: provider, setState: setState);
-              print('### press ${appState.press++}');
-            },
-            child: Text(appState.isStarted
-                ? 'pause'
-                : (appState.sessionDuration == AppState.zeroingDuration
-                    ? 'Start'
-                    : 'Resume')),
-          ),
-          //Stop button
-          ElevatedButton(
-            onPressed: () {
-              provider.stop(appState: appState, setState: setState);
-              print('### press ${appState.press++}');
-            },
-            child: const Text('Stop'),
-          ),
-          ElevatedButton(
+      child: FittedBox(
+        child: Row(
+          children: <Widget>[
+            //Stop button
+            ElevatedButton(
               onPressed: () {
-                provider.deleteSessions(appState: appState, setState: setState);
-                appState.test = 0;
-                appState.test2 = 0;
-                appState.press = 0;
+                provider.stop(appState: appState, setState: setState);
+                print('### press ${appState.press++}');
               },
-              child: const Text('clear list')),
-        ],
+              child: const Text('Stop'),
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            ElevatedButton(
+                key: const ValueKey('deleteSessions'),
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return deleteDialog(null, provider, appState, context,
+                            () {
+                          provider.deleteSessions(
+                            appState: appState,
+                            setState: setState,
+                          );
+                          appState.test = 0;
+                          appState.test2 = 0;
+                          appState.press = 0;
+                        }, 'Confirm to delete ALL Session');
+                      });
+                },
+                child: const Text('clear list')),
+          ],
+        ),
       ),
     );
   }

@@ -24,7 +24,11 @@ class _InheritedTimerState extends State<InheritedTimer> {
     return Column(
       children: [
 //timer
-        TimeWidget(provider: provider, appState: appState),
+        TimeWidget(
+          provider: provider,
+          appState: appState,
+          textStyle: const TextStyle(),
+        ),
 //Start / Pause / Resume Button
         ElevatedButton(
           onPressed: () {

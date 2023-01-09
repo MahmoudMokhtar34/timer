@@ -30,7 +30,12 @@ class Provider extends State<StateWidget> {
   }
 
   void activateTimerTimer({required Function setState}) {
+    //TODO: check activity of timerObject
+    print('### to 1 ${appState.timerObject?.isActive}');
     if (appState.isStarted) {
+      if (appState.timerObject != null && appState.timerObject!.isActive) {
+        return;
+      }
       appState.timerObject = Timer.periodic(
         const Duration(seconds: 1),
         (timer) {
@@ -43,6 +48,7 @@ class Provider extends State<StateWidget> {
           );
         },
       );
+      print('### to 2 ${appState.timerObject?.isActive}');
     } else {
       appState.timerObject?.cancel();
     }
@@ -92,6 +98,12 @@ class Provider extends State<StateWidget> {
   }) {
     setState(() {
       appState.sessions.clear();
+    });
+  }
+
+  void deleteOneSession(AppState appState, int index, Function setState) {
+    setState(() {
+      appState.sessions.removeAt(index);
     });
   }
 
