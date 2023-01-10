@@ -202,22 +202,97 @@ class _HomePageState extends State<HomePage> {
 
   Container statistics(Provider provider, AppState appState) {
     return Container(
-      color: Colors.grey[200],
-      width: double.infinity,
-      alignment: Alignment.center,
-      child: GridView.count(
-        //crossAxisSpacing: 1,
-        //mainAxisSpacing: 2,
-        crossAxisCount: 2,
-        children: <Widget>[
-          Text('Sum ${provider.formatDuration(provider.sumSessions())}'),
-          Text('Avg ${provider.formatDuration(provider.avgSessions())}'),
-          Text('count ${appState.sessions.length}'),
-          Text(
-              'sess > limt ${appState.sessions.where((e) => e < appState.sessionLimit).length}'),
-        ],
-      ),
-    );
+        color: Colors.grey[200],
+        //width: double.infinity,
+        alignment: Alignment.center,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                        child: Card(
+                            color: Colors.grey[300],
+                            child: Center(
+                              child: Text(
+                                  textAlign: TextAlign.center,
+                                  'Sum\n ${provider.formatDuration(provider.sumSessions())}'),
+                            ))),
+                    Expanded(
+                        child: Card(
+                            color: Colors.grey[300],
+                            child: Center(
+                              child: Text(
+                                  textAlign: TextAlign.center,
+                                  'Avg\n ${provider.formatDuration(provider.avgSessions())}'),
+                            )))
+                  ]),
+            ),
+            Expanded(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                        child: Card(
+                            color: Colors.grey[300],
+                            child: Center(
+                                child: Text(
+                                    textAlign: TextAlign.center,
+                                    'count\n ${appState.sessions.length}')))),
+                    Expanded(
+                        child: Card(
+                            color: Colors.grey[300],
+                            child: Center(
+                              child: Text(
+                                  textAlign: TextAlign.center,
+                                  'sess > limt\n ${appState.sessions.where((e) => e < appState.sessionLimit).length}'),
+                            ))),
+                  ]),
+            ),
+          ],
+        )
+
+        // Column(
+
+        //   children: <Widget>[
+        //     Expanded(
+        //       child: Row(
+        //         children: [
+        //           Expanded(
+        //             child: Card(
+        //                 child: Text(
+        //                     'Sum ${provider.formatDuration(provider.sumSessions())}')),
+        //           ),
+        //           Expanded(
+        //             child: Card(
+        //                 child: Text(
+        //                     'Avg ${provider.formatDuration(provider.avgSessions())}')),
+        //           ),
+        //         ],
+        //       ),
+        //     ),
+        //     Expanded(
+        //       child: Row(
+        //         children: [
+        //           Expanded(
+        //               child:
+        //                   Card(child: Text('count ${appState.sessions.length}'))),
+        //           Expanded(
+        //             child: Card(
+        //               child: Text(
+        //                   'sess > limt ${appState.sessions.where((e) => e < appState.sessionLimit).length}'),
+        //             ),
+        //           ),
+        //         ],
+        //       ),
+        //     ),
+        //   ],
+        // ),
+        );
   }
 
   Widget buttons(Provider provider, AppState appState) {
