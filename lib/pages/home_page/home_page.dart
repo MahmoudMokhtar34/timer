@@ -26,11 +26,13 @@ class _HomePageState extends State<HomePage> {
             IconButton(
                 onPressed: (() {
                   showModalBottomSheet(
+                      isDismissible: false,
                       context: context,
                       builder: (context) {
                         return Settings(
                           appState: appState,
                           provider: provider,
+                          setState: setState,
                         );
                       });
                 }),
@@ -134,6 +136,9 @@ class _HomePageState extends State<HomePage> {
           return Card(
             key: ObjectKey(appState.sessions[index]),
             child: ListTile(
+              tileColor: appState.sessions[index] < appState.sessionLimit
+                  ? Colors.red[100]
+                  : null,
               leading: Text('${index + 1}'),
               title: Text(provider.formatDuration(appState.sessions[index])),
               trailing: IconButton(
@@ -197,26 +202,27 @@ class _HomePageState extends State<HomePage> {
 
   Container statistics(Provider provider, AppState appState) {
     return Container(
-      color: Colors.blue[50],
+      color: Colors.grey[200],
       width: double.infinity,
       alignment: Alignment.center,
-      child: FittedBox(
-        child: Column(
-          children: [
-            Text('Sum ${provider.formatDuration(provider.sumSessions())}'),
-            Text('Avg ${provider.formatDuration(provider.avgSessions())}'),
-            Text('number of sess ${appState.sessions.length}'),
-            const Text(
-                'editable max min limit // ask befor delete//coloring above limit'),
-          ],
-        ),
+      child: GridView.count(
+        //crossAxisSpacing: 1,
+        //mainAxisSpacing: 2,
+        crossAxisCount: 2,
+        children: <Widget>[
+          Text('Sum ${provider.formatDuration(provider.sumSessions())}'),
+          Text('Avg ${provider.formatDuration(provider.avgSessions())}'),
+          Text('count ${appState.sessions.length}'),
+          Text(
+              'sess > limt ${appState.sessions.where((e) => e < appState.sessionLimit).length}'),
+        ],
       ),
     );
   }
 
   Widget buttons(Provider provider, AppState appState) {
     return Container(
-      color: Colors.green[50],
+      color: Colors.grey[300],
       width: double.infinity,
       alignment: Alignment.center,
       child: FittedBox(
@@ -262,9 +268,14 @@ class _HomePageState extends State<HomePage> {
 }
 
 class Settings extends StatefulWidget {
-  const Settings({super.key, required this.appState, required this.provider});
+  const Settings(
+      {super.key,
+      required this.appState,
+      required this.provider,
+      required this.setState});
   final AppState appState;
   final Provider provider;
+  final Function setState;
 
   @override
   State<Settings> createState() => _SettingsState();
@@ -273,9 +284,6 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
-    // int minutes = widget.appState.sessionLimit.inMinutes;
-    // int seconds = widget.appState.sessionLimit.inMinutes ~/ 60;
-
     return Container(
       color: Colors.grey[350],
       height: 200,
@@ -323,21 +331,27 @@ class _SettingsState extends State<Settings> {
               ),
             ],
           ),
-          Row(
-            children: const <Widget>[],
-          )
+          ElevatedButton(
+              onPressed: () {
+                //updating home page wih the new limi before closing bottom sheet
+                widget.setState(() {});
+                Navigator.of(context).pop();
+              },
+              child: const Text('Done'))
         ],
       ),
     );
   }
 
+  //get the current limit
   Duration sessionLimit() => widget.appState.sessionLimit;
+  //update to new limit
   void newLimit(Duration duration) {
     if (duration < AppState.zeroingDuration) return;
     widget.appState.sessionLimit = duration;
   }
 }
-//  Column( 
+//  Column(
 //         mainAxisAlignment: MainAxisAlignment.center,
 //         crossAxisAlignment: CrossAxisAlignment.stretch,
 //         children: const [
