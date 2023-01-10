@@ -22,6 +22,20 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Timer'),
+          actions: [
+            IconButton(
+                onPressed: (() {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return Settings(
+                          appState: appState,
+                          provider: provider,
+                        );
+                      });
+                }),
+                icon: const Icon(Icons.settings))
+          ],
         ),
         body:
 //Body
@@ -159,18 +173,24 @@ class _HomePageState extends State<HomePage> {
           width: double.infinity,
           alignment: Alignment.center,
           margin: const EdgeInsetsDirectional.all(30),
-          child: Column(
-            children: [
-              Text(message),
-              TextButton.icon(
-                icon: const Icon(Icons.delete),
-                label: const Text('Delete'),
-                onPressed: () {
-                  delete();
-                  Navigator.pop(context);
-                },
-              )
-            ],
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Stack(
+              children: [
+                Center(child: Text(message)),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: TextButton.icon(
+                    icon: const Icon(Icons.delete),
+                    label: const Text('Delete'),
+                    onPressed: () {
+                      delete();
+                      Navigator.pop(context);
+                    },
+                  ),
+                )
+              ],
+            ),
           )),
     );
   }
@@ -194,7 +214,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Container buttons(Provider provider, AppState appState) {
+  Widget buttons(Provider provider, AppState appState) {
     return Container(
       color: Colors.green[50],
       width: double.infinity,
@@ -213,25 +233,27 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(
               width: 10,
             ),
-            ElevatedButton(
-                key: const ValueKey('deleteSessions'),
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return deleteDialog(null, provider, appState, context,
-                            () {
-                          provider.deleteSessions(
-                            appState: appState,
-                            setState: setState,
-                          );
-                          appState.test = 0;
-                          appState.test2 = 0;
-                          appState.press = 0;
-                        }, 'Confirm to delete ALL Session');
-                      });
-                },
-                child: const Text('clear list')),
+            Builder(builder: (context) {
+              return ElevatedButton(
+                  key: const ValueKey('deleteSessions'),
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return deleteDialog(null, provider, appState, context,
+                              () {
+                            provider.deleteSessions(
+                              appState: appState,
+                              setState: setState,
+                            );
+                            appState.test = 0;
+                            appState.test2 = 0;
+                            appState.press = 0;
+                          }, 'Confirm to delete ALL Sessions');
+                        });
+                  },
+                  child: const Text('clear list'));
+            }),
           ],
         ),
       ),
@@ -239,7 +261,83 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-//  Column(
+class Settings extends StatefulWidget {
+  const Settings({super.key, required this.appState, required this.provider});
+  final AppState appState;
+  final Provider provider;
+
+  @override
+  State<Settings> createState() => _SettingsState();
+}
+
+class _SettingsState extends State<Settings> {
+  @override
+  Widget build(BuildContext context) {
+    // int minutes = widget.appState.sessionLimit.inMinutes;
+    // int seconds = widget.appState.sessionLimit.inMinutes ~/ 60;
+
+    return Container(
+      color: Colors.grey[350],
+      height: 200,
+      width: double.infinity,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            //minutes
+            children: <Widget>[
+              IconButton(
+                onPressed: () => setState(() {
+                  newLimit(sessionLimit() - const Duration(minutes: 1));
+                }),
+                icon: const Icon(Icons.remove),
+              ),
+              Text(
+                  '${sessionLimit().inMinutes >= 60 ? sessionLimit().inMinutes % 60 : sessionLimit().inMinutes}'),
+              IconButton(
+                onPressed: () => setState(() {
+                  newLimit(sessionLimit() + const Duration(minutes: 1));
+                }),
+                icon: const Icon(Icons.add),
+              ),
+
+              const SizedBox(
+                width: 20,
+              ),
+              //seconds
+              IconButton(
+                onPressed: () => setState(() {
+                  newLimit(sessionLimit() - const Duration(seconds: 1));
+                }),
+                icon: const Icon(Icons.remove),
+              ),
+              Text(
+                  '${sessionLimit().inSeconds >= 60 ? sessionLimit().inSeconds % 60 : sessionLimit().inSeconds}'),
+              IconButton(
+                onPressed: () => setState(() {
+                  newLimit(sessionLimit() + const Duration(seconds: 1));
+                }),
+                icon: const Icon(Icons.add),
+              ),
+            ],
+          ),
+          Row(
+            children: const <Widget>[],
+          )
+        ],
+      ),
+    );
+  }
+
+  Duration sessionLimit() => widget.appState.sessionLimit;
+  void newLimit(Duration duration) {
+    if (duration < AppState.zeroingDuration) return;
+    widget.appState.sessionLimit = duration;
+  }
+}
+//  Column( 
 //         mainAxisAlignment: MainAxisAlignment.center,
 //         crossAxisAlignment: CrossAxisAlignment.stretch,
 //         children: const [

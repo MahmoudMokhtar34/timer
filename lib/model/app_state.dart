@@ -5,9 +5,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 class AppState {
-  int test = 0;
-  int test2 = 0;
-  int press = 0;
+  int test;
+  int test2;
+  int press;
   List<Duration> sessions;
   static const Duration zeroingDuration = Duration(seconds: 0);
   DateTime? sessionStartTime;
@@ -16,58 +16,79 @@ class AppState {
   Duration sessionDuration;
   bool isStarted;
   Timer? timerObject;
+  Duration sessionLimit;
 
   AppState({
+    this.test = 0,
+    this.test2 = 0,
+    this.press = 0,
     required this.sessions,
     this.sessionStartTime,
     this.lapDuration = zeroingDuration,
     this.sessionDuration = zeroingDuration,
     this.isStarted = false,
     this.timerObject,
+    this.sessionLimit = const Duration(minutes: 1, seconds: 30),
   });
 
   AppState copyWith({
+    int? test,
+    int? test2,
+    int? press,
     List<Duration>? sessions,
     DateTime? sessionStartTime,
     Duration? lapDuration,
     Duration? sessionDuration,
     bool? isStarted,
     Timer? timerObject,
+    Duration? sessionLimit,
   }) {
     return AppState(
+      test: test ?? this.test,
+      test2: test2 ?? this.test2,
+      press: press ?? this.press,
       sessions: sessions ?? this.sessions,
       sessionStartTime: sessionStartTime ?? this.sessionStartTime,
       lapDuration: lapDuration ?? this.lapDuration,
       sessionDuration: sessionDuration ?? this.sessionDuration,
       isStarted: isStarted ?? this.isStarted,
       timerObject: timerObject ?? this.timerObject,
+      sessionLimit: sessionLimit ?? this.sessionLimit,
     );
   }
 
   @override
   String toString() {
-    return 'AppState(sessions: $sessions, sessionStartTime: $sessionStartTime, currentDuration: $lapDuration, sessionDuration: $sessionDuration, isStarted: $isStarted, timerObject: $timerObject)';
+    return 'AppState(test: $test, test2: $test2, press: $press, sessions: $sessions, sessionStartTime: $sessionStartTime, lapDuration: $lapDuration, sessionDuration: $sessionDuration, isStarted: $isStarted, timerObject: $timerObject, sessionLimit: $sessionLimit)';
   }
 
   @override
   bool operator ==(covariant AppState other) {
     if (identical(this, other)) return true;
 
-    return listEquals(other.sessions, sessions) &&
+    return other.test == test &&
+        other.test2 == test2 &&
+        other.press == press &&
+        listEquals(other.sessions, sessions) &&
         other.sessionStartTime == sessionStartTime &&
         other.lapDuration == lapDuration &&
         other.sessionDuration == sessionDuration &&
         other.isStarted == isStarted &&
-        other.timerObject == timerObject;
+        other.timerObject == timerObject &&
+        other.sessionLimit == sessionLimit;
   }
 
   @override
   int get hashCode {
-    return sessions.hashCode ^
+    return test.hashCode ^
+        test2.hashCode ^
+        press.hashCode ^
+        sessions.hashCode ^
         sessionStartTime.hashCode ^
         lapDuration.hashCode ^
         sessionDuration.hashCode ^
         isStarted.hashCode ^
-        timerObject.hashCode;
+        timerObject.hashCode ^
+        sessionLimit.hashCode;
   }
 }
