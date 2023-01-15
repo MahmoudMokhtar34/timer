@@ -23,7 +23,12 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           title: const Text('Timer'),
           actions: [
-            IconButton(
+            TextButton.icon(
+                style: ButtonStyle(
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.white),
+                ),
+                label: const Text('set Limit'),
                 onPressed: (() {
                   showModalBottomSheet(
                       isDismissible: false,
@@ -77,33 +82,31 @@ class _HomePageState extends State<HomePage> {
   Widget timer(Provider provider, AppState appState) {
     Widget start = appState.isStarted
         ? const SizedBox()
-        : const Center(
-            child: SizedBox.expand(
-                child: IconButton(
+        : IconButton(
             onPressed: null,
             icon: Icon(
-              Icons.play_arrow,
-              size: 120,
+              Icons.play_arrow_rounded,
+              size: 100,
+              color: Colors.blue[200],
             ),
-          )));
+          );
     Widget resume = appState.isStarted ? const Icon(Icons.pause) : Container();
 
     return Stack(
+      alignment: Alignment.center,
+      fit: StackFit.expand,
       children: [
+        start,
         Container(
           width: double.infinity,
-          color: Colors.grey[200],
+          //color: Colors.grey[200],
+
           alignment: Alignment.center,
           child: FittedBox(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TimeWidget(
-                  provider: provider,
-                  appState: appState,
-                  textStyle: const TextStyle(fontSize: 70),
-                ),
-              ],
+            child: TimeWidget(
+              provider: provider,
+              appState: appState,
+              textStyle: const TextStyle(fontSize: 70),
             ),
           ),
         ),
@@ -111,7 +114,6 @@ class _HomePageState extends State<HomePage> {
           alignment: Alignment.bottomCenter,
           child: resume,
         ),
-        start,
         GestureDetector(
           onTap: () {
             provider.startPAuseResume(
@@ -136,7 +138,8 @@ class _HomePageState extends State<HomePage> {
           return Card(
             key: ObjectKey(appState.sessions[index]),
             child: ListTile(
-              tileColor: appState.sessions[index] < appState.sessionLimit
+              tileColor: appState.sessions[index].inSeconds >
+                      appState.sessionLimit.inSeconds
                   ? Colors.red[100]
                   : null,
               leading: Text('${index + 1}'),
@@ -184,7 +187,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Center(child: Text(message)),
                 Align(
-                  alignment: Alignment.bottomRight,
+                  alignment: Alignment.bottomCenter,
                   child: TextButton.icon(
                     icon: const Icon(Icons.delete),
                     label: const Text('Delete'),
@@ -249,7 +252,7 @@ class _HomePageState extends State<HomePage> {
                             child: Center(
                               child: Text(
                                   textAlign: TextAlign.center,
-                                  'sess > limt\n ${appState.sessions.where((e) => e < appState.sessionLimit).length}'),
+                                  'sess > limit\n ${appState.sessions.where((e) => e < appState.sessionLimit).length}'),
                             ))),
                   ]),
             ),
@@ -371,48 +374,92 @@ class _SettingsState extends State<Settings> {
             mainAxisAlignment: MainAxisAlignment.center,
             //minutes
             children: <Widget>[
-              IconButton(
-                onPressed: () => setState(() {
-                  newLimit(sessionLimit() - const Duration(minutes: 1));
-                }),
-                icon: const Icon(Icons.remove),
-              ),
-              Text(
-                  '${sessionLimit().inMinutes >= 60 ? sessionLimit().inMinutes % 60 : sessionLimit().inMinutes}'),
-              IconButton(
-                onPressed: () => setState(() {
-                  newLimit(sessionLimit() + const Duration(minutes: 1));
-                }),
-                icon: const Icon(Icons.add),
+              Column(
+                children: [
+                  const Text(
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                      'Minutes'),
+                  const SizedBox(width: 0.0, height: 8.0),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => setState(() {
+                          newLimit(sessionLimit() - const Duration(minutes: 1));
+                        }),
+                        icon: const Icon(Icons.remove),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 24),
+                            '${sessionLimit().inMinutes >= 60 ? sessionLimit().inMinutes % 60 : sessionLimit().inMinutes}'),
+                      ),
+                      IconButton(
+                        onPressed: () => setState(() {
+                          newLimit(sessionLimit() + const Duration(minutes: 1));
+                        }),
+                        icon: const Icon(Icons.add),
+                      ),
+                    ],
+                  ),
+                ],
               ),
 
               const SizedBox(
                 width: 20,
               ),
               //seconds
-              IconButton(
-                onPressed: () => setState(() {
-                  newLimit(sessionLimit() - const Duration(seconds: 1));
-                }),
-                icon: const Icon(Icons.remove),
-              ),
-              Text(
-                  '${sessionLimit().inSeconds >= 60 ? sessionLimit().inSeconds % 60 : sessionLimit().inSeconds}'),
-              IconButton(
-                onPressed: () => setState(() {
-                  newLimit(sessionLimit() + const Duration(seconds: 1));
-                }),
-                icon: const Icon(Icons.add),
+              Column(
+                children: [
+                  const Text(
+                    'seconds',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(width: 0.0, height: 8.0),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => setState(() {
+                          newLimit(sessionLimit() - const Duration(seconds: 1));
+                        }),
+                        icon: const Icon(Icons.remove),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 24),
+                            '${sessionLimit().inSeconds >= 60 ? sessionLimit().inSeconds % 60 : sessionLimit().inSeconds}'),
+                      ),
+                      IconButton(
+                        onPressed: () => setState(() {
+                          newLimit(sessionLimit() + const Duration(seconds: 1));
+                        }),
+                        icon: const Icon(Icons.add),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),
-          ElevatedButton(
-              onPressed: () {
-                //updating home page wih the new limi before closing bottom sheet
-                widget.setState(() {});
-                Navigator.of(context).pop();
-              },
-              child: const Text('Done'))
+          Padding(
+            padding: const EdgeInsets.only(top: 16.0),
+            child: ElevatedButton(
+                onPressed: () {
+                  //updating home page wih the new limi before closing bottom sheet
+                  widget.setState(() {});
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Done')),
+          )
         ],
       ),
     );

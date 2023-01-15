@@ -30,9 +30,9 @@ class Provider extends State<StateWidget> {
   }
 
   void activateTimerTimer({required Function setState}) {
-    //TODO: check activity of timerObject
     print('### to 1 ${appState.timerObject?.isActive}');
     if (appState.isStarted) {
+      //check activity of timerObject
       if (appState.timerObject != null && appState.timerObject!.isActive) {
         return;
       }
@@ -127,6 +127,6 @@ class Provider extends State<StateWidget> {
     }
     double avgInSeconds = sumSessions().inSeconds / appState.sessions.length;
 
-    return Duration(seconds: avgInSeconds.round());
+    return Duration(seconds: avgInSeconds.floor());
   }
 }
