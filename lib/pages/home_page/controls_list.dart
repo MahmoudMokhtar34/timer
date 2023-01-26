@@ -56,7 +56,8 @@ class _InheritedTimerState extends State<InheritedTimer> {
 //delete all sessions
         ElevatedButton(
             onPressed: () {
-              provider.deleteSessions(appState: appState, setState: setState);
+              provider.deleteAllSessions(
+                  appState: appState, setState: setState);
               appState.test = 0;
               appState.test2 = 0;
               appState.press = 0;

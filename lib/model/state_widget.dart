@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:timer/model/shared_prefrences.dart';
 
 import './app_state.dart';
 import './inherited_state.dart';
@@ -18,7 +19,7 @@ class StateWidget extends StatefulWidget {
 }
 
 class Provider extends State<StateWidget> {
-  AppState appState = AppState(sessions: []);
+  AppState appState = AppState(sessions: SharedPrefs.getSessions());
 
   @override
   Widget build(BuildContext context) {
@@ -85,25 +86,32 @@ class Provider extends State<StateWidget> {
       appState.isStarted = false;
       appState.sessionDuration =
           appState.sessionDuration + appState.lapDuration;
-      appState.sessions.add(appState.sessionDuration);
+      addSession(appState.sessionDuration);
       appState.lapDuration = AppState.zeroingDuration;
       appState.sessionDuration = AppState.zeroingDuration;
     });
   }
 
+  void addSession(Duration session) {
+    appState.sessions.add(session);
+    SharedPrefs.saveOneSession(session);
+  }
+
 //
-  void deleteSessions({
+  void deleteAllSessions({
     required AppState appState,
     required Function setState,
   }) {
     setState(() {
       appState.sessions.clear();
+      SharedPrefs.deleteSessions();
     });
   }
 
   void deleteOneSession(AppState appState, int index, Function setState) {
     setState(() {
       appState.sessions.removeAt(index);
+      SharedPrefs.saveAllSessions(appState.sessions);
     });
   }
 

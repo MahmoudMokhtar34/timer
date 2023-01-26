@@ -12,70 +12,113 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // TODO: implement didChangeAppLifecycleState
+    //dummy example
+    if (state == AppLifecycleState.paused) {
+      print(state);
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     Provider provider = InheritedState.of(context) as Provider;
     AppState appState = provider.appState;
     print('### build 1 ${appState.test++}');
 
+    var appBar2 = AppBar(
+      title: const Text('Timer'),
+      actions: [
+        TextButton.icon(
+            style: ButtonStyle(
+              foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+            ),
+            label: const Text('set Limit'),
+            onPressed: (() {
+              showModalBottomSheet(
+                  isDismissible: false,
+                  context: context,
+                  builder: (context) {
+                    return Settings(
+                      appState: appState,
+                      provider: provider,
+                      setState: setState,
+                    );
+                  });
+            }),
+            icon: const Icon(Icons.settings))
+      ],
+    );
+    //TODO: check if these variables or just  mqd = MediaQuery.of(context); is better
+    final deviceWidth = MediaQuery.of(context).size.width;
+    final deviceHeight = MediaQuery.of(context).size.height;
+    final topPadding = MediaQuery.of(context).padding.top;
+    final viewInsets = MediaQuery.of(context).viewInsets;
+    final viewPadding = MediaQuery.of(context).viewPadding;
+    final appBarHeight = appBar2.preferredSize.height;
+    final height2 = deviceHeight - topPadding - appBarHeight;
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Timer'),
-          actions: [
-            TextButton.icon(
-                style: ButtonStyle(
-                  foregroundColor:
-                      MaterialStateProperty.all<Color>(Colors.white),
-                ),
-                label: const Text('set Limit'),
-                onPressed: (() {
-                  showModalBottomSheet(
-                      isDismissible: false,
-                      context: context,
-                      builder: (context) {
-                        return Settings(
-                          appState: appState,
-                          provider: provider,
-                          setState: setState,
-                        );
-                      });
-                }),
-                icon: const Icon(Icons.settings))
-          ],
-        ),
+        resizeToAvoidBottomInset: true,
+        appBar: appBar2,
         body:
 //Body
             SafeArea(
-          child: Container(
-            width: double.infinity,
-            color: Colors.grey[50],
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
+          child: LayoutBuilder(builder: (context, constraints) {
+            final width = constraints.maxWidth;
+            final height = constraints.maxHeight;
+            debugPrint(
+                '### dh $deviceHeight , dp $topPadding , $appBarHeight, $height2 ,sh $height  dw $deviceWidth , sw $width');
+            return Container(
+              width: double.infinity,
+              color: Colors.grey[200],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
 //Timer
-                Expanded(
-                  flex: 20,
-                  child: timer(provider, appState),
-                ),
+                  SizedBox(
+                    width: width,
+                    height: height * 0.18,
+                    child: timer(provider, appState),
+                  ),
 //List of sessions,
-                Expanded(
-                  flex: 65,
-                  child: sessionsList(appState, provider),
-                ),
+                  SizedBox(
+                    width: width,
+                    height: height * 0.6,
+                    child: sessionsList(appState, provider),
+                  ),
+
 //Statistics,
-                Expanded(
-                  flex: 15,
-                  child: statistics(provider, appState),
-                ),
+                  SizedBox(
+                    width: width,
+                    height: height * 0.14,
+                    child: statistics(provider, appState),
+                  ),
 //buttons,
-                Expanded(
-                  flex: 10,
-                  child: buttons(provider, appState),
-                ),
-              ],
-            ),
-          ),
+                  SizedBox(
+                    width: width,
+                    height: height * 0.08,
+                    child: buttons(provider, appState),
+                  ),
+                ],
+              ),
+            );
+          }),
         ));
   }
 
@@ -84,17 +127,19 @@ class _HomePageState extends State<HomePage> {
         ? const SizedBox()
         : IconButton(
             onPressed: null,
-            icon: Icon(
-              Icons.play_arrow_rounded,
-              size: 100,
-              color: Colors.blue[200],
+            iconSize: 300,
+            icon: FittedBox(
+              fit: BoxFit.cover,
+              child: Icon(
+                Icons.play_arrow_rounded,
+                color: Colors.blue[200],
+              ),
             ),
           );
     Widget resume = appState.isStarted ? const Icon(Icons.pause) : Container();
 
     return Stack(
       alignment: Alignment.center,
-      fit: StackFit.expand,
       children: [
         start,
         Container(
@@ -252,7 +297,7 @@ class _HomePageState extends State<HomePage> {
                             child: Center(
                               child: Text(
                                   textAlign: TextAlign.center,
-                                  'sess > limit\n ${appState.sessions.where((e) => e < appState.sessionLimit).length}'),
+                                  'sess > limit\n ${appState.sessions.where((e) => e > appState.sessionLimit).length}'),
                             ))),
                   ]),
             ),
@@ -326,7 +371,7 @@ class _HomePageState extends State<HomePage> {
                         builder: (context) {
                           return deleteDialog(null, provider, appState, context,
                               () {
-                            provider.deleteSessions(
+                            provider.deleteAllSessions(
                               appState: appState,
                               setState: setState,
                             );
@@ -363,12 +408,17 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       color: Colors.grey[350],
       height: 200,
       width: double.infinity,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
+          //TODO: delete me start
+          const TextField(),
+          //TODO delete me start
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,

@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:timer/model/app_state.dart';
 import 'package:timer/model/state_widget.dart';
 
+//TODO: expermint with inherited widget setState to detect if updating the
+//widget will automaticaly update other widgets depending on it
+//now we are changing the state and not the widget
+
 class TimeWidget extends StatefulWidget {
   const TimeWidget({
     Key? key,
