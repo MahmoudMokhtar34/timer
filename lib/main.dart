@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'package:timer/model/shared_prefrences.dart';
 import 'model/state_widget.dart';
 
 import 'pages/home_page/home_page.dart';
 
 void main() {
   debugPaintSizeEnabled = false;
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  SharedPrefs.intitPrefs;
   runApp(const MyApp());
 }
 

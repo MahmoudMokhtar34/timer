@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import './app_state.dart';
 import './state_widget.dart';
 
-
-
 class InheritedState extends InheritedWidget {
   const InheritedState(
       {required this.appState,
@@ -16,6 +14,8 @@ class InheritedState extends InheritedWidget {
   final Widget myChild;
   final AppState appState;
   final Provider provider;
+
+  //TODO try manipulating this to automatically update the widgets that depend on it when it change
 
   static Provider? of(BuildContext context) {
     return context
